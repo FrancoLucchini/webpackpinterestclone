@@ -1,7 +1,7 @@
 class ImgServices{
     
     constructor(){
-        this.URI = 'http://localhost:3000/img/';
+        this.URI = '/img';
     }
 
     async getImgs(){
