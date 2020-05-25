@@ -7,7 +7,12 @@ const devMode = process.env.NODE_ENV !== 'production';
 module.exports = {
 
 
-    entry: './frontend/app.js',
+    entry: {
+        app: [
+            "@babel/polyfill",
+            './frontend/app.js'
+        ]
+    },
 
 
     output: {
@@ -16,11 +21,17 @@ module.exports = {
     },
 
     module: {
-        rules: [{
-            test: /\.css/,
+        rules: [
+            {
+                test: /\.js$/,
+                loader: 'babel-loader'
+            },
+            {
+            test: /\.sass/,
             use: [
                 devMode ? 'style-loader' : MiniCssExtractPlugin.loader,
-                'css-loader'
+                'css-loader',
+                'sass-loader'
             ]
         }]
     },

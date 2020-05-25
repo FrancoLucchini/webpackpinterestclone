@@ -1,6 +1,13 @@
 const Img = require('../models/img');
-const fsextra = require('fs-extra');
+const fs = require('fs-extra');
 const path = require('path');
+
+const cloudinary = require('cloudinary');
+cloudinary.config({
+    cloud_name: process.env.CLOUD,
+    api_key: process.env.API_KEY,
+    api_secret: process.env.API_SECRET_KEY
+});
 
 imgController = {}
 
@@ -10,11 +17,11 @@ imgController.index = async(req, res) => {
 }
 imgController.createImg = async(req, res) => {
 
-    const img = new Img({
-        title: req.body.title,
-        description: req.body.description,
-        path: '/img/' + req.file.filename
-    });
+    const {url} = await cloudinary.v2.uploader.upload(req.file.path);     
+    const img = new Img();
+    img.path = url;
+
+    await fs.unlink(req.file.path);
     await img.save();
     res.json({message: 'Img created'});
 }
@@ -22,7 +29,6 @@ imgController.createImg = async(req, res) => {
 imgController.deleteImg = async(req, res) => {
     const {id} = req.params
     const imageDeleted = await Img.findByIdAndRemove(id);
-    await fsextra.unlink(path.resolve('./backend/src/public' + imageDeleted.path));
 
     res.json({message: 'Img deleted'});
 }
